@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Selection</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'solver/PuzzleSelectStyles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Select a Sudoku Puzzle</h1>
+
+        <!-- Hardcoded puzzles -->
+        <ul class="puzzle-list">
+            <li><a href="{% url 'load_puzzle' 'easy' %}" class="puzzle-link">Easy Puzzle</a></li>
+            <li><a href="{% url 'load_puzzle' 'medium' %}" class="puzzle-link">Medium Puzzle</a></li>
+            <li><a href="{% url 'load_puzzle' 'hard' %}" class="puzzle-link">Hard Puzzle</a></li>
+        </ul>
+
+        <!-- Dynamically loaded puzzles from the database -->
+        <h2>Available Puzzles</h2>
+        <ul class="puzzle-list">
+            {% for puzzle in puzzles %}
+            <li>
+                <a href="{% url 'load_puzzle' puzzle.name %}" class="puzzle-link">{{ puzzle.name|capfirst }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Link to create a custom puzzle -->
+        <a href="{% url 'board_creator' %}" class="btn-empty-grid">Make Custom Puzzle</a>
+    </div>
+</body>
+</html>

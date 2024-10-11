@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sudoku.name|capfirst }} - Sudoku Grid</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'solver/SudokuStyles.css' %}">
+    
+    <!-- some styles seem to not function well in the css file for some reason... -->
+    <style>
+        .conflict {
+            background-color: red;
+        }
+        .locked {
+            background-color: #e0e0e0; /* Gray background for locked cells */
+            pointer-events: none; /* Prevent editing of locked cells */
+        }
+        .locked.conflict {
+            background-color: red; /* Turn locked cells red if in conflict */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Adds the custom puzzle name at the top -->
+    <h1>{{ sudoku.name|capfirst }} - Sudoku Grid</h1>
+
+    <!-- Stopwatch display -->
+    <h2 id="timer">Elapsed Time: {{ elapsed_time|default:0 }} seconds</h2>
+
+    <!-- Display error messages difficult to see right now -->
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form id="sudokuForm" method="post">
+        {% csrf_token %}
+        <table>
+            <!-- changed the grid to an object of the sudoku object -->
+            {% for row in sudoku.grid %}
+            <tr>
+                {% for cell in row %}
+                <td>
+                    <input type="text" name="cell_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" 
+                           value="{% if cell.value == 0 %}{% else %}{{ cell.value }}{% endif %}" 
+                           class="sudoku-cell {% if cell.locked %}locked{% endif %}" maxlength="1">
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">Submit</button>
+        <button type="button" class="btn-gray" id="newPuzzleButton">Select a New Puzzle</button>
+        <button type="button" id="clearButton">Clear</button>
+    </form>
+</div>
+
+<script>
+let startTime = Math.floor(Date.now() / 1000);  // sets start time to current time in seconds when page loads
+let elapsedSeconds = 0;
+
+// Function to update the elapsed time display
+function updateTimer() {
+    const currentTime = Math.floor(Date.now() / 1000);  // Get current time in seconds
+    elapsedSeconds = currentTime - startTime;  // Calculate elapsed seconds as the difference between current time and start time
+    document.getElementById('timer').innerText = `Elapsed Time: ${elapsedSeconds} seconds`;  // Update the timer display
+}
+
+// Start the timer interval to update every 1000ms (1 second)
+setInterval(updateTimer, 1000);
+
+// Get all cells
+const cells = document.querySelectorAll('.sudoku-cell');
+
+// Function to highlight conflicts
+function highlightConflicts(cell) {
+    const value = cell.value;
+    const row = parseInt(cell.name.split('_')[1]); //extracts the row from the cell name
+    const col = parseInt(cell.name.split('_')[2]); //extracts the column from the cell name
+    const allCells = document.querySelectorAll('.sudoku-cell'); //gets all the cells
+    const conflicts = [];
+
+    allCells.forEach(c => {
+        const [rowIndex, colIndex] = c.name.split('_').slice(1).map(Number); // Extract row and column index from cell name
+        if (c !== cell && c.value === value && value !== '') { // Check if the value is the same and not empty
+            // Check row, column, and box
+            if (rowIndex === row || colIndex === col || 
+                (Math.floor(rowIndex / 3) === Math.floor(row / 3) && Math.floor(colIndex / 3) === Math.floor(col / 3))) { // Check if the cell is in the same row, column, or box
+                conflicts.push(c); // Add the cell to the conflicts array if it is in the same row, column, or box
+            }
+        }
+    });
+
+    // Clear previous conflict highlights
+    allCells.forEach(c => c.classList.remove('conflict'));
+
+    // Highlight conflicts, including locked cells
+    conflicts.forEach(c => c.classList.add('conflict'));
+}
+
+// Checks cells for conflicts on input or click
+cells.forEach(cell => {
+    cell.addEventListener('input', function() {
+        highlightConflicts(this);
+    });
+
+    cell.addEventListener('click', function() {
+        highlightConflicts(this);
+    });
+});
+
+// Clear all non-locked cells
+document.getElementById('clearButton').addEventListener('click', function() {
+    startTime = Math.floor(Date.now() / 1000);  // Reset the start time (restart the timer)
+    const cells = document.querySelectorAll('.sudoku-cell');
+    cells.forEach(cell => {
+        if (!cell.classList.contains('locked')) {
+            cell.value = '';  // Clear the value of non-locked cells
+        }
+    });
+});
+
+// Redirect to the puzzle selection page
+document.getElementById('newPuzzleButton').addEventListener('click', function() {
+    window.location.href = "{% url 'puzzle_selection' %}";
+});
+
+// Handle form submission to include the timer value
+document.getElementById('sudokuForm').addEventListener('submit', function(event) {
+    // Create a hidden input field for elapsed time
+    const hiddenElapsedTime = document.createElement('input');
+    hiddenElapsedTime.type = 'hidden';
+    hiddenElapsedTime.name = 'elapsed_time';
+    hiddenElapsedTime.value = elapsedSeconds;
+
+    // Append the hidden input to the form
+    this.appendChild(hiddenElapsedTime);
+});
+</script>
+</body>
+</html>

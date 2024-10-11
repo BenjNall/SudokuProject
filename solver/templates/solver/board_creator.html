@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport sets the content based on the device width  -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Custom Sudoku Puzzle</title>
+    <!-- Loads the same css used for the main grid -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'solver/SudokuStyles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create Custom Puzzle</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            <label for="puzzle_name">Puzzle Name:</label>
+            <input type="text" id="puzzle_name" name="puzzle_name" placeholder="Enter puzzle name" required>
+
+            <table>
+                {% for i in "012345678" %}
+                <tr>
+                    {% for j in "012345678" %}
+                    <td>
+                        <input type="text" name="cell_{{ i }}_{{ j }}" maxlength="1" class="sudoku-cell">
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+            <button type="submit">Save Custom Puzzle</button>
+            <a href="{% url 'puzzle_selection' %}" class="btn-gray">Back to Puzzle Selection</a>
+        </form>
+    </div>
+</body>
+</html>
