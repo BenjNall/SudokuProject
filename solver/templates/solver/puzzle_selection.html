@@ -1,3 +1,5 @@
+<!-- html for puzzle select screen (also serves as homepage) -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +18,7 @@
             <li><a href="{% url 'load_puzzle' 'easy' %}" class="puzzle-link">Easy Puzzle</a></li>
             <li><a href="{% url 'load_puzzle' 'medium' %}" class="puzzle-link">Medium Puzzle</a></li>
             <li><a href="{% url 'load_puzzle' 'hard' %}" class="puzzle-link">Hard Puzzle</a></li>
+            <li><a href="{% url 'load_puzzle' 'test' %}" class="puzzle-link">Test Puzzle</a></li>
         </ul>
 
         <!-- Dynamically loaded puzzles from the database -->
@@ -30,6 +33,15 @@
 
         <!-- Link to create a custom puzzle -->
         <a href="{% url 'board_creator' %}" class="btn-empty-grid">Make Custom Puzzle</a>
+
+        <!-- Link to User Selection -->
+        <a href="{% url 'user_selection' %}" class="btn-empty-grid">Select or Create User</a>
+        {% if selected_user %}
+            <p>Selected User: {{ selected_user.username }}</p>
+            <p>Average Time: {{ selected_user.average_time }} seconds</p>
+            <p>Last Solve Time: {{ selected_user.solved_time }} seconds</p>
+            <p>Total Puzzles: {{ selected_user.puzzle_count }}</p>
+        {% endif %}
     </div>
 </body>
 </html>

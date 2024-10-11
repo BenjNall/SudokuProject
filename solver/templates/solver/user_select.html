@@ -1,0 +1,41 @@
+<!-- html for user selection screen (borrows from puzzle selection screen) -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select or Create User</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'solver/PuzzleSelectStyles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create or Select User</h1>
+
+        <!-- Form to create or select a user -->
+        <form method="post">
+            {% csrf_token %}
+            <label for="username">Enter Username:</label>
+            <input type="text" name="username" id="username" placeholder="Enter username" required>
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- List of available users for selection -->
+        <h2>Available Users</h2>
+        <ul>
+            {% for user in users %}
+                <li>
+                    <a class="puzzle-link" href="{% url 'puzzle_selection' %}?username={{ user.username }}">{{ user.username }}</a>
+                    <p>Average Time: {{ user.average_time }} seconds</p>
+                    <p>Last Solve Time: {{ user.solved_time }} seconds</p>
+                    <p>Total Puzzles: {{ user.puzzle_count }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Back to puzzle selection -->
+        <a href="{% url 'puzzle_selection' %}" class="btn-back">Back to Puzzle Selection</a>
+    </div>
+</body>
+</html>

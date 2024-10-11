@@ -1,3 +1,4 @@
+<!-- main sudoku board screen (includes duplicate logic and checking) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +30,7 @@
     <!-- Stopwatch display -->
     <h2 id="timer">Elapsed Time: {{ elapsed_time|default:0 }} seconds</h2>
 
-    <!-- Display error messages difficult to see right now -->
+    <!-- Now only shows success message -->
     {% if messages %}
         <ul>
         {% for message in messages %}

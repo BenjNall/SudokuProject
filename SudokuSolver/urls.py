@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from solver import views
+from django.shortcuts import redirect
 """
 URL configuration for SudokuSolver project.
 
@@ -22,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Display the Sudoku grid
-    path('', views.sudoku_grid, name='sudoku_grid'),
+    path('', lambda request: redirect('puzzle_selection')),
     
     # Display the predefined puzzles
     path('puzzles/', views.puzzle_selection, name='puzzle_selection'),
@@ -30,10 +31,14 @@ urlpatterns = [
     # Load a predefined puzzle
     path('load_puzzle/<str:puzzle_name>/', views.load_puzzle, name='load_puzzle'),
     
+    path('sudoku/', views.sudoku_grid, name='sudoku_grid'),
     # Enter path to start timer
     # integrated into solver page: obsolete
    # path('stopwatch/', views.stopwatch, name='stopwatch'),
 
     # Display a blank board to create a custom grid
     path('board-creator/', views.board_creator, name='board_creator'),
+
+    # Display the user selection page
+    path('user-select/', views.user_selection, name='user_selection'),
 ]
