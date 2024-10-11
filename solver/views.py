@@ -218,11 +218,11 @@ def user_selection(request):
     users = Users.objects.all()  # Get all existing users
     
     if request.method == 'POST':
-        username = request.POST.get('username') # Get the username from the form
+        username = request.POST.get('username')  # Get the username from the form
         if username:
             # Create or get the user
-            user = Users.objects.get_or_create(username=username)
-            request.session['user_id'] = user.id  # Store the user in session
+            user, created = Users.objects.get_or_create(username=username)  # Unpack the tuple
+            request.session['user_id'] = user.id  # Store the user ID in the session
             return redirect(f'{reverse("puzzle_selection")}?username={user.username}')  # Redirect with username as a query parameter
 
     return render(request, 'solver/user_select.html', {'users': users})
